@@ -1,119 +1,125 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>X-Wing Probability Calculator</title>
-  <link rel="stylesheet" href="./jquery-ui/jquery-ui.css">
-  <script src="./jquery-2.1.3.min.js"></script>
-  <script src="./jquery-ui/jquery-ui.min.js"></script>
-</head>
-<body>
+<html>
+  <head>
+    <title>X-wing Probability Calculator Tabajara 2.0</title>
+    <meta content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style></style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">    
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="xwingprob2.js"></script>
+  
+  </head>
+  <body>
+  
+<div class="form-horizontal">
+<!-- Form Name -->
+<legend>X-Wing Probability Calculator Tabajara 2.0</legend>
 
-X-Wing Miniatures Game<br>
-Probability Calculator Tabajara (by Hunter Vatto)<br>
-<br>
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-2 control-label" for="textHit">Dices</label>  
+  <div class="col-md-2">
+  <input id="textHit" name="textHit" placeholder="3" class="form-control input-md spinner" required="" type="number" value="3" min="1" max="10">
+  </div>
+</div>
 
-<input type="checkbox" class="check" id="checkboxRollType"><label for="checkboxRollType">Attack</label>
-<input type="checkbox" class="check" id="checkbox1"><label for="checkbox1">Not using focus</label>
-<input type="checkbox" class="check" id="checkbox2"><label for="checkbox2">Not using target lock</label>
+<div class="form-group">
+  <div class="col-md-2"></div>
+  <div class="col-md-2">
+    <label class="radio-inline"><input type="radio" name="rollType" value="attack" checked>Attack</label>
+    <label class="radio-inline"><input type="radio" name="rollType" value="defense">Defense</label>
+  </div>
+</div>
 
-<br>
-Dices: <input class="spinner" id="spinnerHit"><br>
+<div class="form-group" id="generalMods">
+  <label class="col-md-2 control-label" for="attackCheckboxes">General Modifiers</label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="focusCheckbox">
+      <input name="focusCheckbox" id="focusCheckbox" value="" type="checkbox">
+      Focus
+    </label>
+  </div>
+  <div class="checkbox">
+    <label for="rerollsCheckbox">
+      <input name="rerollsCheckbox" id="rerollsCheckbox" value="" type="checkbox">
+      Limited rerolls
+      <input id="numberOfRerolls" name="numberOfRerolls" class="form-control input-md spinner" type="number" value="1" min="0" max="10">
+    </label>
+  </div>
+  </div>
+</div>
 
-<button id="calcButton">Calculate</button><br><br>
-<div id="res2"></div>
+<!-- Multiple Checkboxes -->
+<div class="form-group" id="attackMods">
+  <label class="col-md-2 control-label" for="attackCheckboxes">Attack Modifiers</label>
+  <div class="col-md-2">
+  <div class="checkbox">
+    <label for="targetLockCheckBox">
+      <input name="targetLockCheckBox" id="targetLockCheckBox" value="" type="checkbox">
+      Target Lock
+    </label>
+        </div>
+  <div class="checkbox" style="display: none">
+    <label for="attackCheckboxes-3">
+      <input name="attackCheckboxes" id="attackCheckboxes-3" value="" type="checkbox">
+      Predator
+    </label>
+        </div>
+  <div class="checkbox" style="display: none">
+    <label for="attackCheckboxes-4">
+      <input name="attackCheckboxes" id="attackCheckboxes-4" value="" type="checkbox">
+      Guidance Chips
+    </label>
+        </div>
+  </div>
+</div>
 
+<!-- Multiple Checkboxes -->
+<div class="form-group" id="defenseMods" style="display: none">
+  <label class="col-md-2 control-label" for="defenseCheckboxes">Defense Modifiers</label>
+  <div class="col-md-2">
+  <div class="checkbox" style="display: none">
+    <label for="defenseCheckboxes-1">
+      <input name="defenseCheckboxes" id="defenseCheckboxes-1" value="" type="checkbox">
+      Evade
+    </label>
+        </div>
+  <div class="checkbox" style="display: none">
+    <label for="defenseCheckboxes-2">
+      <input name="defenseCheckboxes" id="defenseCheckboxes-2" value="" type="checkbox">
+      Autothrusters
+    </label>
+        </div>
+    <div class="checkbox">
+    <label for="zuckussCheckbox">
+      <input name="zuckussCheckbox" id="zuckussCheckbox" value="" type="checkbox">
+      Zuckuss
+    </label>
+        </div>
+  <div class="checkbox" style="display: none">
+    <label for="defenseCheckboxes-3">
+      <input name="defenseCheckboxes" id="defenseCheckboxes-3" value="" type="checkbox">
+      Lone Wolf
+    </label>
+  </div>
+  </div>
+</div>
 
-<script>
-function factorial(n) {
-	var res=1;	
-	for (i=2;i<n+1;i++){
-		res*=i;
-	}
-	return res;
-}
+<!-- Button -->
+<div class="form-group">
+  <div class="col-md-2"></div>
+  <div class="col-md-2">
+    <button id="calcButton" name="calcButton" class="btn btn-primary">calculate</button>
+  </div>
+</div>
+<div class="form-group">
+  <div class="col-md-2"></div>
+  <div class="col-md-2" id="res2"></div>
+</div>
+</div>
 
-function pbinomial(k,n, p) {
-	comb= factorial(n)/(factorial(n-k)*factorial(k));
-	return comb*Math.pow(p,k)*Math.pow(1-p,n-k);
-}
-
-function calcProb() {
-	var n=$("#spinnerHit").spinner("value");
-	//var n=$("#spinnerMiss").spinner("value")+k;
-	
-	var p=0.5;
-	var title="Hits";
-	if ($("#checkboxRollType").is(':checked')==true) {
-		p=3/8;
-		title="Evades";
-	}	
-	if ($("#checkbox1").is(':checked')==true) {	
-		p+=0.25;
-	} 
-	if ($("#checkbox2").is(':checked')==true) {
-		p=1-(1-p)*(1-p);
-	}
-	//$("#res2").text(pbinomial(k,n,p)*100+'%');
-
-	
-	//computes probabilities	
-	var res=calcProbArray(n,p);
-	
-	//creates output table
-	$("#res2").empty();
-	$("#res2").append("<table>");
-	$("#res2").append("<tr><td>"+title+"</td><td>Probability</td></tr>");
-	for (i in res) {
-		$("#res2").append("<tr><td>"+i+"</td><td>"+res[i]+"</td></tr>");	
-	}
-	$("#res2").append("</table>");
-}
-
-function calcProbArray(n,p) {
-	var res=[];
-	for (var i=0; i<(n+1); i++){
-		var prob=pbinomial(i,n,p);
-		res.push((prob*100).toFixed(2)+"%");
-		//alert(i+", "+n+", "+p+": "+prob);
-	}
-	return res;
-}
-
-//Sets all spinners min max 
-$( ".spinner" ).spinner({max: 20, min: 0}).val(3);
-
-//set these guys as buttons
-$( ".check,#calcButton" ).button();
-
-$("#checkboxRollType").button().click(function () {
-    var text = '';
-    if ($(this).is(':checked')) {
-    	text="Defense";
-    	$("#checkbox2").prop("checked", false);
-    	$("#checkbox2").button('option','disabled',true);
-    } else {
-    	text="Attack";
-    	$("#checkbox2").button('option','disabled',false);
-    }
-    $(this).button('option', 'label', text);
-});
-
-$("#checkbox1").button().click(function () {
-    var text = $(this).is(':checked')? "Using focus": "Not using focus";
-    $(this).button('option', 'label', text);
-});
-
-$("#checkbox2").button().click(function () {
-    var text = $(this).is(':checked')? "Using target lock": "Not using target lock";
-    $(this).button('option', 'label', text);
-});
-
-$( "#calcButton" ).button().click(function() {
-	calcProb();
-});
-
-</script>
- 
-</body>
+  
+  </body>
 </html>
